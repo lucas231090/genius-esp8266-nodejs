@@ -1,4 +1,5 @@
 //Professor Lucas - server websocket nodejs + esp8266 - Genius
+//Websockets by Markus Sattler
 #include <ESP8266WiFi.h>
 #include <WebSocketsClient.h>
 
