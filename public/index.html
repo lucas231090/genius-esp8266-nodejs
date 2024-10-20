@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Genius Game</title>
+    <style>
+      body {
+        text-align: center;
+        margin-top: 50px;
+      }
+      .color-btn {
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+        display: inline-block;
+      }
+      #red {
+        background-color: red;
+      }
+      #green {
+        background-color: green;
+      }
+      #blue {
+        background-color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Genius Game</h1>
+    <button id="startGame">Start Game</button>
+    <div>
+      <div id="red" class="color-btn"></div>
+      <div id="green" class="color-btn"></div>
+      <div id="blue" class="color-btn"></div>
+    </div>
+
+    <script>
+      const socket = new WebSocket("ws://localhost:3000");
+      let userSequence = [];
+
+      document.getElementById("startGame").addEventListener("click", () => {
+        socket.send(JSON.stringify({ type: "start" }));
+      });
+
+      const buttons = document.querySelectorAll(".color-btn");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const color = btn.id;
+          userSequence.push(color);
+          socket.send(JSON.stringify({ type: "userInput", userSequence }));
+        });
+      });
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "sequence") {
+          alert(`Memorize essa sequência: ${data.sequence.join(", ")}`);
+        } else if (data.type === "nextLevel") {
+          alert(`Próximo nível! Sequência: ${data.sequence.join(", ")}`);
+          userSequence = [];
+        } else if (data.type === "gameOver") {
+          alert("Você errou! O jogo reiniciará.");
+          userSequence = [];
+        }
+      };
+    </script>
+  </body>
+</html>
